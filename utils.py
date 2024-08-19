@@ -15,7 +15,7 @@ import pickle
 import torch
 import random
 from transformers import LogitsWarper
-from dipper_paraphrases.detect_gpt.run import get_perturbation_results
+from dipper_paraphrases.detectgpt_run import get_perturbation_results
 from sklearn.metrics import roc_curve, auc
 
 from dipper_paraphrases.sim.models import load_model
