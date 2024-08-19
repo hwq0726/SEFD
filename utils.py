@@ -495,3 +495,11 @@ def update_pool_random_both(pool, gens_list_score, gens_list_sim, sen, dec_score
         gens_list_score[index] = dec_score
         gens_list_sim[index] = sim_score
         return pool, gens_list_score, gens_list_sim, pool_update
+
+
+def get_ll(text, base_model, base_tokenizer):
+    with torch.no_grad():
+        tokenized = base_tokenizer(text, return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
+        labels = tokenized.input_ids
+
+        return -base_model(**tokenized, labels=labels).loss.item()
