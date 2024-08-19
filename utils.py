@@ -27,9 +27,9 @@ GPTZERO_API_KEYS = ['58654fc7baa748e2afbe89c6a11d6c28']
 gptzero_idx = 0
 
 lfqa_database = None
-with open("lfqa-data/inputs.jsonl", "r") as f:
-    lfqa_database = [json.loads(x) for x in f.read().strip().split("\n")]
-    lfqa_database = {dd["prefix"]: dd for dd in lfqa_database}
+# with open("lfqa-data/inputs.jsonl", "r") as f:
+#     lfqa_database = [json.loads(x) for x in f.read().strip().split("\n")]
+#     lfqa_database = {dd["prefix"]: dd for dd in lfqa_database}
 
 def get_longest_answer(prefix):
     if "Answer the following question in 200-250 words.\n" in prefix:
@@ -48,7 +48,7 @@ def get_longest_answer(prefix):
 def load_shared_args(parser):
     parser.add_argument('--output_file', default="lfqa-data/gpt2_xl_strength_0.0_frac_0.5_300_len_top_p_0.9.jsonl_pp")
     parser.add_argument('--base_model', default="gpt2-xl", type=str)
-    parser.add_argument('--detector_cache', default="lfqa-data/openai_cache.json")
+    parser.add_argument('--detector_cache', default="detect_cache/openai_cache.json")
     parser.add_argument('--num_shards', default=1, type=int)
     parser.add_argument('--local_rank', default=0, type=int)
     parser.add_argument('--target_fpr', default=0.01, type=float)
