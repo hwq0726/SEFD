@@ -14,6 +14,7 @@ import requests
 import pickle
 import torch
 import random
+import torch.nn.functional as F
 from transformers import LogitsWarper
 from dipper_paraphrases.detectgpt_run import get_perturbation_results
 from sklearn.metrics import roc_curve, auc
@@ -497,9 +498,63 @@ def update_pool_random_both(pool, gens_list_score, gens_list_sim, sen, dec_score
         return pool, gens_list_score, gens_list_sim, pool_update
 
 
-def get_ll(text, base_model, base_tokenizer):
-    with torch.no_grad():
-        tokenized = base_tokenizer(text, return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
-        labels = tokenized.input_ids
+def get_ll(text, cache, base_model, base_tokenizer):
+    cache_updated = False
+    if text not in cache:
+        with torch.no_grad():
+            tokenized = base_tokenizer(text, return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
+            labels = tokenized.input_ids
+            output = -base_model(**tokenized, labels=labels).loss.item()
+        cache[text] = output
+        cache_updated = True
+    else:
+        output = cache[text]
 
-        return -base_model(**tokenized, labels=labels).loss.item()
+    return output, cache_updated
+
+
+def get_rank(text, cache, base_model, base_tokenizer, log=False, device='cuda'):
+    cache_updated = False
+    if text not in cache:
+        with torch.no_grad():
+            tokenized = base_tokenizer(text, return_tensors="pt").to(device)
+            logits = base_model(**tokenized).logits[:,:-1]
+            labels = tokenized.input_ids[:,1:]
+
+            # get rank of each label token in the model's likelihood ordering
+            matches = (logits.argsort(-1, descending=True) == labels.unsqueeze(-1)).nonzero()
+
+            assert matches.shape[1] == 3, f"Expected 3 dimensions in matches tensor, got {matches.shape}"
+
+            ranks, timesteps = matches[:,-1], matches[:,-2]
+
+            # make sure we got exactly one match for each timestep in the sequence
+            assert (timesteps == torch.arange(len(timesteps)).to(timesteps.device)).all(), "Expected one match per timestep"
+
+            ranks = ranks.float() + 1 # convert to 1-indexed rank
+            if log:
+                ranks = torch.log(ranks)
+
+            output = ranks.float().mean().item()
+        cache[text] = output
+        cache_updated = True
+    else:
+        output = cache[text]
+
+    return output, cache_updated
+
+
+def get_entropy(text, cache, base_model, base_tokenizer, device='cuda'):
+    cache_updated = False
+    if text not in cache:
+        with torch.no_grad():
+            tokenized = base_tokenizer(text, return_tensors="pt").to(device)
+            logits = base_model(**tokenized).logits[:,:-1]
+            neg_entropy = F.softmax(logits, dim=-1) * F.log_softmax(logits, dim=-1)
+            output = -neg_entropy.sum(-1).mean().item()
+        cache[text] = output
+        cache_updated = True
+    else:
+        output = cache[text]
+
+    return output, cache_updated
