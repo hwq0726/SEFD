@@ -48,7 +48,7 @@ ranklog_fn = functools.partial(get_rank, base_model=model, base_tokenizer=tokeni
 entropy_fn = functools.partial(get_entropy, base_model=model, base_tokenizer=tokenizer)
 function_list = [likelihood_fn, rank_fn, ranklog_fn, entropy_fn]
 function_name_list = ['likelihood', 'rank', 'rank_log', 'entropy']
-
+save_name = args.data[5:-9]
 # get database and inputs
 cands = []
 truncate_tokens = 10000 #args.total_tokens
@@ -119,7 +119,7 @@ print('Complete initialize pool')
 for i in tqdm.tqdm(range(len(function_name_list))):
     func = function_name_list[i]
 
-    cache_path = f'detect_cache/{func}_cache.json'
+    cache_path = f'detect_cache/{func}_{save_name}_cache.json'
     if os.path.exists(cache_path):
         with open(cache_path, "r") as f:
             cache = json.load(f)
@@ -163,7 +163,6 @@ for i in tqdm.tqdm(range(len(function_name_list))):
 
     print('The number of text in pool: ', len(pool))
 
-    save_name = args.data[5:]
 
     with open(f"score/score_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_{func}.pkl",
               'wb') as f:
