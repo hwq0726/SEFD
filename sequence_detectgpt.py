@@ -167,7 +167,7 @@ for cand in tqdm.tqdm(cands_squence):
 
 print('The number of text in pool:', len(pool))
 
-save_name = args.data[5:]
+save_name = args.data[5:-9]
 
 with open(f"score/score_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_detectgpt.pkl", 'wb') as f:
     pickle.dump(score_list, f)
