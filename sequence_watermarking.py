@@ -167,5 +167,4 @@ with open(f"score/score_{save_name}_{args.threshold}_{args.sim_threshold}_{args.
 with open(f"pool/pool_{save_name}_{args.threshold}_{args.sim_threshold}_{args.pool_size}_watermark.pkl", 'wb') as f:
     pickle.dump(pool_num, f)
 
-print('test')
 
