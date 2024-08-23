@@ -20,13 +20,15 @@ case $SLURM_ARRAY_TASK_ID in
   1)
     DATA="data/gpt2_xl_wm.jsonl_pp"
     CA="detect_cache/watermarking_gpt2.json"
+    P=0
     ;;
   2)
     DATA="data/opt_13b_wm.jsonl_pp"
     CA="detect_cache/watermarking_opt.json"
+    P=0
     ;;
 esac
 
 # Run the Python script with parameters
-python sequence_watermarking.py --data $DATA --detector_cache $CA
+python sequence_watermarking.py --data $DATA --detector_cache $CA --pool_size $P
 
