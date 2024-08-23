@@ -10,6 +10,7 @@ import os
 import random
 from sentence_transformers import SentenceTransformer, util
 import torch
+from torch.ao.nn.quantized.functional import threshold
 
 from utils import load_shared_args, get_ll, get_rank, get_entropy
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM
@@ -19,8 +20,7 @@ nltk.download('punkt')
 
 parser = argparse.ArgumentParser()
 load_shared_args(parser)
-#parser.add_argument('--paraphrase_times', default='paraphrase_outputs', type=str)
-parser.add_argument('--prob_threshold', default=-100, type=float)
+parser.add_argument('--prob_threshold', default=[-2.5, -10, -1.25, -3], type=list)
 parser.add_argument('--sim_threshold', default=0.75, type=float)
 parser.add_argument('--total_tokens', default=30, type=int)
 parser.add_argument('--pool_size', default=5, type=int)
@@ -48,6 +48,7 @@ ranklog_fn = functools.partial(get_rank, base_model=model, base_tokenizer=tokeni
 entropy_fn = functools.partial(get_entropy, base_model=model, base_tokenizer=tokenizer)
 function_list = [likelihood_fn, rank_fn, ranklog_fn, entropy_fn]
 function_name_list = ['likelihood', 'rank', 'rank_log', 'entropy']
+thresholds = args.prob_threshold
 save_name = args.data[5:-9]
 # get database and inputs
 cands = []
@@ -118,7 +119,7 @@ print('Complete initialize pool')
 
 for i in tqdm.tqdm(range(len(function_name_list))):
     func = function_name_list[i]
-
+    th = thresholds[i]
     cache_path = f'detect_cache/{func}_{save_name}_cache.json'
     if os.path.exists(cache_path):
         with open(cache_path, "r") as f:
@@ -144,7 +145,9 @@ for i in tqdm.tqdm(range(len(function_name_list))):
                 json.dump(cache, f)
         if len(pool) == 0:
             score_list.append((score, 0))
-            if score >= args.prob_threshold:
+            if func != 'likelihood':
+                score = -score
+            if score >= th:
                 embedding = embedder.encode(cand, convert_to_tensor=True)
                 pool.append(embedding)
         else:
@@ -154,9 +157,11 @@ for i in tqdm.tqdm(range(len(function_name_list))):
             index = search_result['corpus_id']
             sim_score = search_result['score']
             score_list.append((score, sim_score))
-            if score >= args.prob_threshold and sim_score < args.sim_threshold:
+            if func != 'likelihood':
+                score = -score
+            if score >= th and sim_score < args.sim_threshold:
                 pool.append(embedding)
-            elif score < args.prob_threshold and sim_score >= args.sim_threshold:
+            elif score < th and sim_score >= args.sim_threshold:
                 del pool[index]
                 pool.append(embedding)
         pool_num.append((count, len(pool)))
@@ -164,11 +169,11 @@ for i in tqdm.tqdm(range(len(function_name_list))):
     print('The number of text in pool: ', len(pool))
 
 
-    with open(f"score/score_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_{func}.pkl",
+    with open(f"score/score_{save_name}_{th}_{args.sim_threshold}_{args.pool_size}_{func}.pkl",
               'wb') as f:
         pickle.dump(score_list, f)
 
-    with open(f"pool/pool_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_{func}.pkl",
+    with open(f"pool/pool_{save_name}_{th}_{args.sim_threshold}_{args.pool_size}_{func}.pkl",
               'wb') as f:
         pickle.dump(pool_num, f)
 
