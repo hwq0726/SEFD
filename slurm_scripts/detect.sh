@@ -19,18 +19,22 @@ cd /cbica/home/hewei/projects/detect_framework
 case $SLURM_ARRAY_TASK_ID in
   1)
     DATA="data/gpt-4o-mini.jsonl_pp"
+    P=0
     ;;
   2)
     DATA="data/gpt2_xl.jsonl_pp"
+    P=0
     ;;
   3)
     DATA="data/gpt3.jsonl_pp"
+    P=0
     ;;
   4)
     DATA="data/opt_13b.jsonl_pp"
+    P=0
     ;;
 esac
 
 # Run the Python script with parameters
-python sequence_prob.py --data $DATA
+python sequence_prob.py --data $DATA --pool_size $P
 
