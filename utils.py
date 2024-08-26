@@ -558,3 +558,22 @@ def get_entropy(text, cache, base_model, base_tokenizer, device='cuda'):
         output = cache[text]
 
     return output, cache_updated
+
+
+def preprocess_text(text):
+    return text.replace('\n', ' ').replace('  ', ' ')
+
+
+def get_mle_single(text, cache, tokenizer, model, solver, device='cuda'):
+    cache_updated = False
+    if text not in cache:
+        inputs = tokenizer(preprocess_text(text), truncation=True, max_length=512, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outp = model(**inputs)
+        output = solver.fit_transform(outp[0][0].cpu().numpy()[1:-1])
+        cache[text] = output
+        cache_updated = True
+    else:
+        output = cache[text]
+
+    return -output, cache_updated
