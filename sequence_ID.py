@@ -14,11 +14,11 @@ from skdim.id import MLE
 parser = argparse.ArgumentParser()
 parser.add_argument('--threshold', default=-11.0, type=float)
 parser.add_argument('--sim_threshold', default=0.75, type=float)
-parser.add_argument('--total_tokens', default=200, type=int)
-parser.add_argument('--data', default='data/gpt2_xl_wm.jsonl_pp', type=str)
+parser.add_argument('--total_tokens', default=50, type=int)
+parser.add_argument('--data', default='data/gpt-4o-mini.jsonl_pp', type=str)
 parser.add_argument('--model', default='FacebookAI/roberta-base', type=str)
 parser.add_argument('--tokenizer', default='FacebookAI/roberta-base', type=str)
-parser.add_argument('--detector_cache', default="detect_cache/ID_MLE.json", type=str)
+parser.add_argument('--detector_cache', default="detect_cache/ID_gpt4o.json", type=str)
 parser.add_argument('--embedder', default='all-MiniLM-L6-v2', type=str)
 parser.add_argument('--pool_size', default=5, type=int)
 args = parser.parse_args()
@@ -109,7 +109,7 @@ print('Complete initialize pool')
 score_list = []
 pool_num = []
 count = 0
-for cand in tqdm.tqdm(cands_squence[:5]):
+for cand in tqdm.tqdm(cands_squence):
     count += 1
     score, cache1 = detect_fn(cand, cache)
     if cache1:
@@ -118,7 +118,7 @@ for cand in tqdm.tqdm(cands_squence[:5]):
             json.dump(cache, f)
     if len(pool) == 0:
         score_list.append((score, 0))
-        if score >= args.prob_threshold:
+        if score >= args.threshold:
             embedding = embedder.encode(cand, convert_to_tensor=True)
             pool.append(embedding)
     else:
@@ -139,8 +139,9 @@ print('The number of text in pool:', len(pool))
 
 save_name = args.data[5:-9]
 
-with open(f"score/score_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_ID-MLE.pkl", 'wb') as f:
+with open(f"score/score_{save_name}_{args.threshold}_{args.sim_threshold}_{args.pool_size}_ID-MLE.pkl", 'wb') as f:
     pickle.dump(score_list, f)
 
-with open(f"pool/pool_{save_name}_{args.prob_threshold}_{args.sim_threshold}_{args.pool_size}_ID-MLE.pkl", 'wb') as f:
+with open(f"pool/pool_{save_name}_{args.threshold}_{args.sim_threshold}_{args.pool_size}_ID-MLE.pkl", 'wb') as f:
     pickle.dump(pool_num, f)
+
