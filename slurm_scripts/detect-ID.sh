@@ -19,18 +19,22 @@ cd /cbica/home/hewei/projects/detect_framework
 case $SLURM_ARRAY_TASK_ID in
   1)
     DATA="data/gpt-4o-mini.jsonl_pp"
+    CA="detect_cache/ID_gpt4o.json"
     ;;
   2)
     DATA="data/gpt2_xl.jsonl_pp"
+    CA="detect_cache/ID_gpt2.json"
     ;;
   3)
     DATA="data/gpt3.jsonl_pp"
+    CA="detect_cache/ID_gpt3.json"
     ;;
   4)
     DATA="data/opt_13b.jsonl_pp"
+    CA="detect_cache/ID_opt13.json"
     ;;
 esac
 
 # Run the Python script with parameters
-python sequence_ID.py --data $DATA
+python sequence_ID.py --data $DATA --detector_cache $CA
 
