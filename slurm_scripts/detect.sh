@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH      --job-name="detectai"
 #SBATCH      --mail-user="weiqingh@sas.upenn.edu"
-#SBATCH      --time=4:00:00
+#SBATCH      --time=1:00:00
 #SBATCH      --mem=80G
 #SBATCH      --gpus=a40
 #SBATCH      --mail-type=ALL
@@ -19,22 +19,26 @@ cd /cbica/home/hewei/projects/detect_framework
 case $SLURM_ARRAY_TASK_ID in
   1)
     DATA="data/gpt-4o-mini.jsonl_pp"
-    P=0
+    CA="detect_cache/detectgpt_gpt_4o-mini_cache.json"
+    P=1
     ;;
   2)
     DATA="data/gpt2_xl.jsonl_pp"
-    P=0
+    CA="detect_cache/detectgpt_gpt2_xl_cache.json"
+    P=1
     ;;
   3)
     DATA="data/gpt3.jsonl_pp"
-    P=0
+    CA="detect_cache/detectgpt_gpt3_cache.json"
+    P=1
     ;;
   4)
     DATA="data/opt_13b.jsonl_pp"
-    P=0
+    CA="detect_cache/detectgpt_opt_13b_cache.json"
+    P=1
     ;;
 esac
 
 # Run the Python script with parameters
-python sequence_prob.py --data $DATA --pool_size $P
+python sequence_detectgpt.py --data $DATA --detector_cache $CA --pool_size $P
 
