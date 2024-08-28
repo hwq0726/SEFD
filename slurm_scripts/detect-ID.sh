@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH      --job-name="detectai"
 #SBATCH      --mail-user="weiqingh@sas.upenn.edu"
-#SBATCH      --time=12:00:00
+#SBATCH      --time=1:00:00
 #SBATCH      --mem=80G
 #SBATCH      --gpus=p100
 #SBATCH      --mail-type=ALL
@@ -36,5 +36,5 @@ case $SLURM_ARRAY_TASK_ID in
 esac
 
 # Run the Python script with parameters
-python sequence_ID.py --data $DATA --detector_cache $CA
+python sequence_ID.py --data $DATA --detector_cache $CA --pool_size 0
 
