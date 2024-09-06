@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH      --job-name="detectai"
 #SBATCH      --mail-user="weiqingh@sas.upenn.edu"
-#SBATCH      --time=1:00:00
+#SBATCH      --time=00:30:00
 #SBATCH      --mem=80G
-#SBATCH      --gpus=a40
+#SBATCH      --gpus=p100
 #SBATCH      --mail-type=ALL
 #SBATCH      --array=1-12
 #SBATCH      --output=slurm_output/output_%A_%a.log
@@ -80,5 +80,5 @@ case $SLURM_ARRAY_TASK_ID in
 esac
 
 # Run the Python script with parameters
-python sequence_detectgpt.py --data $DATA --detector_cache $CA --pool_size $P
+python sequence_detectgpt.py --data $DATA --detector_cache $CA --pool_size $P --prob_threshold 0.5 --sim_threshold 0.85 --mask_model "None"
 

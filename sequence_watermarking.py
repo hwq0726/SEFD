@@ -24,7 +24,7 @@ parser.add_argument('--paraphrase_no_exist_behavior', default='skip', type=str)
 parser.add_argument('--data', default='data/gpt2_xl_wm.jsonl_pp', type=str)
 parser.add_argument('--detector_cache', default="detect_cache/watermarking.json", type=str)
 parser.add_argument('--embedder', default='all-MiniLM-L6-v2', type=str)
-parser.add_argument('--pool_size', default=5, type=int)
+parser.add_argument('--pool_size', default=5, type=float)
 args = parser.parse_args()
 
 watermark_fraction = 0.5
