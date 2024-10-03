@@ -4,7 +4,14 @@
 The widespread adoption of large language models (LLMs) has created an urgent need for robust tools to detect LLM-generated text, especially in light of \textit{paraphrasing} techniques that often evade existing detection methods. To address this challenge, we present a novel semantic-enhanced framework for detecting LLM-generated text (SEFD) that leverages a retrieval-based mechanism to fully utilize text semantics. Our framework improves upon existing detection methods by systematically integrating retrieval-based techniques with traditional detectors, employing a carefully curated retrieval mechanism that strikes a balance between comprehensive coverage and computational efficiency. We showcase the effectiveness of our approach in sequential text scenarios common in real-world applications, such as online forums and Q\&A platforms. Through comprehensive experiments across various LLM-generated texts and detection methods, we demonstrate that our framework substantially enhances detection accuracy in paraphrasing scenarios while maintaining robustness for standard LLM-generated content. This work contributes significantly to ongoing efforts to safeguard information integrity in an era where AI-generated content is increasingly prevalent.
 
 ### 📝 Requirements
-The `requirements.txt` file will be updated soon to include the necessary dependencies.
+Before running the code, we need to deploy the environment.
+A recommended way is to use conda to create the environment and install the related packages shown as follows.
+
+```bash
+conda create -n SEFD python=3.9
+pip install -r requirements.txt
+conda activate SEFD
+```
 
 ### 🔨 Usage
 All experiments are implemented on a SLURM cluster. You can find the relevant scripts in the [`slurm_scripts`](slurm_scripts) directory.
