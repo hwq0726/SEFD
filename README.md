@@ -21,3 +21,16 @@ All experiments are implemented on a SLURM cluster. You can find the relevant sc
 - The Intrinsic Dimension code is adapted from [Intrinsic Dimension Estimation for Robust Detection of AI-Generated Texts](https://github.com/ArGintum/GPTID).
 - We also utilize code from [DetectGPT](https://github.com/eric-mitchell/detect-gpt).
 
+### 📖 Citation
+If you find this work helpful, please consider citing our paper:
+
+```bibtex
+@inproceedings{he2024sefd,
+  title={SEFD: semantic-enhanced framework for detecting LLM-generated text},
+  author={He, Weiqing and Hou, Bojian and Shang, Tianqi and Tarzanagh, Davoud Ataee and Long, Qi and Shen, Li},
+  booktitle={2024 IEEE International Conference on Big Data (BigData)},
+  pages={1309--1314},
+  year={2024},
+  organization={IEEE}
+}
+```
